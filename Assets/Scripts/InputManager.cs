@@ -8,19 +8,20 @@ public class InputManager : MonoBehaviour
     private PlayerInput playerInput;
     private PlayerInput.OnFootActions onFoot;
     private PlayerMovement playerMovement;
-    private PlayerLook playerLook;
+    private FirstPersonCamera FirstPersonCamera;
+
     // Start is called before the first frame update
     void Awake()
     {
         playerInput = new PlayerInput();
         onFoot = playerInput.OnFoot;
         playerMovement = GetComponent<PlayerMovement>();
-        playerLook = GetComponent<PlayerLook>();
+        FirstPersonCamera = GetComponent<FirstPersonCamera>();
         onFoot.Jump.performed += ctx => playerMovement.Jump();
-        onFoot.Crouch.started += ctx => playerMovement.Crouch(true);
-        onFoot.Crouch.canceled += ctx => playerMovement.Crouch(false);
-        onFoot.SprintWalk.started += ctx => playerMovement.SprintWalk(true);
-        onFoot.SprintWalk.canceled += ctx => playerMovement.SprintWalk(false);
+        onFoot.Crouch.started += ctx => playerMovement.Crouch();
+        onFoot.Crouch.canceled += ctx => playerMovement.Stand();
+        onFoot.SprintWalk.started += ctx => playerMovement.Walk();
+        onFoot.SprintWalk.canceled += ctx => playerMovement.Sprint();
     }
 
     // Update is called once per frame
@@ -30,7 +31,7 @@ public class InputManager : MonoBehaviour
     }
     void LateUpdate()
     {
-        playerLook.ProcessLook(onFoot.Look.ReadValue<Vector2>());
+        FirstPersonCamera.UpdateCamera(onFoot.Look.ReadValue<Vector2>());
     }
     private void OnEnable()
     {
